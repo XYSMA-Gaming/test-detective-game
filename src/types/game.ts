@@ -1,3 +1,5 @@
+import { ImageSourcePropType } from 'react-native';
+
 export interface Option {
   id: number;
   text: string;
@@ -9,7 +11,6 @@ export interface Scene {
   image: string;
   question: string;
   options: Option[];
-  // Derived at runtime: ignored JSON fields (x, y, width, height)
 }
 
 export interface Connection {
@@ -19,16 +20,28 @@ export interface Connection {
   toBoxId: number;
 }
 
+export interface MissionJson {
+  id: string;
+  title: string;
+  description: string;
+  boxes: Scene[];
+  connections: Connection[];
+}
+
 export interface MissionData {
   boxes: Scene[];
   connections: Connection[];
 }
+
+/** Map of image filename (e.g. "OIG1.jpg") to a require() source */
+export type ImageMap = Record<string, ImageSourcePropType>;
 
 export interface Mission {
   id: string;
   title: string;
   description: string;
   data: MissionData;
+  images: ImageMap;
 }
 
 export interface GameState {

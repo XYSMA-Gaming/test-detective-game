@@ -4,8 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
-  Dimensions,
+  Image,
   ScrollView,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -98,11 +97,19 @@ export default function GameScreen({ route, navigation }: Props) {
     );
   }
 
+  const imageSource = mission.images[currentScene.image];
+
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.imagePlaceholderText}>{currentScene.image}</Text>
+        {imageSource ? (
+          <Image source={imageSource} style={styles.sceneImage} resizeMode="cover" />
+        ) : (
+          <View style={styles.imagePlaceholder}>
+            <Text style={styles.imagePlaceholderText}>{currentScene.image}</Text>
+          </View>
+        )}
+        <View style={styles.sceneLabelOverlay}>
           <Text style={styles.sceneLabel}>{currentScene.label}</Text>
         </View>
       </View>
@@ -113,11 +120,6 @@ export default function GameScreen({ route, navigation }: Props) {
         <ScrollView style={styles.optionsScroll} contentContainerStyle={styles.optionsContainer}>
           {currentScene.options.map((option) => {
             const isSelected = selectedOption === option.id;
-            const hasConnection = mission.data.connections.some(
-              (c) =>
-                c.fromBoxId === currentScene.id &&
-                c.fromOptionId === option.id
-            );
 
             return (
               <TouchableOpacity
@@ -164,6 +166,11 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1,
     minHeight: 250,
+    position: 'relative',
+  },
+  sceneImage: {
+    width: '100%',
+    height: '100%',
   },
   imagePlaceholder: {
     flex: 1,
@@ -174,11 +181,19 @@ const styles = StyleSheet.create({
   imagePlaceholderText: {
     color: '#a0a0b0',
     fontSize: 14,
-    marginBottom: 8,
+  },
+  sceneLabelOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   sceneLabel: {
     color: '#e0e0e0',
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: 'bold',
   },
   contentContainer: {

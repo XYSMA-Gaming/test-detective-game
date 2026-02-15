@@ -4,16 +4,25 @@ import { Mission, MissionJson } from '../types/game';
 // Each mission lives in assets/missions/<id>/mission.json
 import mission1Json from '../../assets/missions/mission-1/mission.json';
 
-// ─── Image registries ───────────────────────────────────────────────
-// React Native requires static require() calls for bundled images.
-// For each mission, map every image filename used in the JSON to its require().
-// When you add a new mission, add its JSON import above and its image map below.
+// ─── Image auto-discovery ───────────────────────────────────────────
+// require.context auto-imports all matching files from a directory.
+// Drop images into the mission folder and they're available instantly.
+// When you add a new mission, add its JSON import above and a context below.
 
-const mission1Images: Record<string, any> = {
-  'OIG1.jpg': require('../../assets/missions/mission-1/OIG1.jpg'),
-  'OIG5.jpg': require('../../assets/missions/mission-1/OIG5.jpg'),
-  'OIG4.jpg': require('../../assets/missions/mission-1/OIG4.jpg'),
-};
+const mission1Ctx = require.context(
+  '../../assets/missions/mission-1',
+  false,
+  /\.(jpg|jpeg|png|webp)$/
+);
+
+function buildImageMap(ctx: RequireContext): Record<string, any> {
+  const images: Record<string, any> = {};
+  for (const key of ctx.keys()) {
+    // key looks like "./OIG1.jpg" — strip the "./"
+    images[key.replace('./', '')] = ctx(key);
+  }
+  return images;
+}
 
 // ─── Build mission list ─────────────────────────────────────────────
 
@@ -31,9 +40,10 @@ function buildMission(json: MissionJson, images: Record<string, any>): Mission {
 }
 
 export const missions: Mission[] = [
-  buildMission(mission1Json as MissionJson, mission1Images),
+  buildMission(mission1Json as MissionJson, buildImageMap(mission1Ctx)),
   // To add more missions:
-  // buildMission(mission2Json as MissionJson, mission2Images),
+  // const mission2Ctx = require.context('../../assets/missions/mission-2', false, /\.(jpg|jpeg|png|webp)$/);
+  // buildMission(mission2Json as MissionJson, buildImageMap(mission2Ctx)),
 ];
 
 export function getMissionById(id: string): Mission | undefined {

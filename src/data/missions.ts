@@ -1,0 +1,58 @@
+import { Mission, MissionJson } from '../types/game';
+
+// ─── Mission JSON imports ───────────────────────────────────────────
+// Each mission lives in assets/missions/<id>/mission.json
+import mission1Json from '../../assets/missions/mission-1/mission.json';
+
+// ─── Image auto-discovery ───────────────────────────────────────────
+// require.context auto-imports all matching files from a directory.
+// Drop images into the mission folder and they're available instantly.
+// When you add a new mission, add its JSON import above and a context below.
+
+const mission1Ctx = require.context(
+  '../../assets/missions/mission-1',
+  false,
+  /\.(jpg|jpeg|png|webp)$/
+);
+
+function buildImageMap(ctx: RequireContext): Record<string, any> {
+  const images: Record<string, any> = {};
+  for (const key of ctx.keys()) {
+    // key looks like "./OIG1.jpg" — strip the "./"
+    images[key.replace('./', '')] = ctx(key);
+  }
+  return images;
+}
+
+// ─── Build mission list ─────────────────────────────────────────────
+
+function buildMission(json: MissionJson, images: Record<string, any>): Mission {
+  return {
+    id: json.id,
+    title: json.title,
+    description: json.description,
+    data: {
+      boxes: json.boxes,
+      connections: json.connections,
+    },
+    images,
+  };
+}
+
+export const missions: Mission[] = [
+  buildMission(mission1Json as MissionJson, buildImageMap(mission1Ctx)),
+  // To add more missions:
+  // const mission2Ctx = require.context('../../assets/missions/mission-2', false, /\.(jpg|jpeg|png|webp)$/);
+  // buildMission(mission2Json as MissionJson, buildImageMap(mission2Ctx)),
+];
+
+export function getMissionById(id: string): Mission | undefined {
+  return missions.find((m) => m.id === id);
+}
+
+export function getStartScene(mission: Mission): number {
+  // The start scene is the first box that is never a target of any connection
+  const targetIds = new Set(mission.data.connections.map((c) => c.toBoxId));
+  const startScene = mission.data.boxes.find((b) => !targetIds.has(b.id));
+  return startScene ? startScene.id : mission.data.boxes[0].id;
+}

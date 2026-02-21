@@ -25,11 +25,17 @@ export interface Connection {
 }
 
 export interface MissionJson {
-  id: string;
+  id: string | number;
   title: string;
   description: string;
-  boxes: Scene[];
-  connections: Connection[];
+  // Old format: top-level boxes/connections
+  boxes?: Scene[];
+  connections?: Connection[];
+  // New format: nested under data
+  data?: {
+    boxes: Scene[];
+    connections: Connection[];
+  };
 }
 
 export interface MissionData {

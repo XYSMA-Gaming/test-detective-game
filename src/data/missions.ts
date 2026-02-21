@@ -50,14 +50,16 @@ function buildMission(
   images: Record<string, any>,
   audio: Record<string, any>
 ): Mission {
+  // Support both old format (top-level boxes/connections)
+  // and new format (nested under data)
+  const boxes = json.data?.boxes ?? json.boxes ?? [];
+  const connections = json.data?.connections ?? json.connections ?? [];
+
   return {
-    id: json.id,
+    id: String(json.id),
     title: json.title,
     description: json.description,
-    data: {
-      boxes: json.boxes,
-      connections: json.connections,
-    },
+    data: { boxes, connections },
     images,
     audio,
   };

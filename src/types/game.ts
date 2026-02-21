@@ -11,6 +11,10 @@ export interface Scene {
   image: string;
   question: string;
   options: Option[];
+  audio?: string | null;
+  audioName?: string | null;
+  extendedAudio?: string | null;
+  extendedAudioName?: string | null;
 }
 
 export interface Connection {
@@ -21,11 +25,17 @@ export interface Connection {
 }
 
 export interface MissionJson {
-  id: string;
+  id: string | number;
   title: string;
   description: string;
-  boxes: Scene[];
-  connections: Connection[];
+  // Old format: top-level boxes/connections
+  boxes?: Scene[];
+  connections?: Connection[];
+  // New format: nested under data
+  data?: {
+    boxes: Scene[];
+    connections: Connection[];
+  };
 }
 
 export interface MissionData {
@@ -36,12 +46,16 @@ export interface MissionData {
 /** Map of image filename (e.g. "OIG1.jpg") to a require() source */
 export type ImageMap = Record<string, ImageSourcePropType>;
 
+/** Map of audio path (e.g. "audio/file.mp3") to a require() source */
+export type AudioMap = Record<string, any>;
+
 export interface Mission {
   id: string;
   title: string;
   description: string;
   data: MissionData;
   images: ImageMap;
+  audio: AudioMap;
 }
 
 export interface GameState {

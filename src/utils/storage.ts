@@ -16,3 +16,15 @@ export async function loadGameState(): Promise<GameState | null> {
 export async function clearGameState(): Promise<void> {
   await AsyncStorage.removeItem(SAVE_KEY);
 }
+
+const ACCESSIBILITY_KEY = 'detective_game_accessibility';
+
+export async function saveAccessibilityMode(enabled: boolean): Promise<void> {
+  await AsyncStorage.setItem(ACCESSIBILITY_KEY, JSON.stringify(enabled));
+}
+
+export async function loadAccessibilityMode(): Promise<boolean> {
+  const data = await AsyncStorage.getItem(ACCESSIBILITY_KEY);
+  if (!data) return false;
+  return JSON.parse(data) as boolean;
+}

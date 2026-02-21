@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,10 +7,16 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
+import { Audio } from 'expo-av';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GameState, RootStackParamList, Scene } from '../types/game';
-import { getMissionById, getStartScene } from '../data/missions';
-import { clearGameState, loadGameState, saveGameState } from '../utils/storage';
+import { getMissionById, getStartScene, resolveImage } from '../data/missions';
+import {
+  clearGameState,
+  loadAccessibilityMode,
+  loadGameState,
+  saveGameState,
+} from '../utils/storage';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Game'>;
 
@@ -21,11 +27,28 @@ export default function GameScreen({ route, navigation }: Props) {
   const [currentScene, setCurrentScene] = useState<Scene | null>(null);
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [accessibilityMode, setAccessibilityMode] = useState(false);
+  const soundRef = useRef<Audio.Sound | null>(null);
+
+  const stopCurrentAudio = useCallback(async () => {
+    if (soundRef.current) {
+      try {
+        await soundRef.current.stopAsync();
+        await soundRef.current.unloadAsync();
+      } catch {
+        // Sound may already be unloaded
+      }
+      soundRef.current = null;
+    }
+  }, []);
 
   useEffect(() => {
     if (!mission) return;
 
     const init = async () => {
+      const isAccessible = await loadAccessibilityMode();
+      setAccessibilityMode(isAccessible);
+
       let state: GameState | null = null;
 
       if (continueGame) {
@@ -51,6 +74,47 @@ export default function GameScreen({ route, navigation }: Props) {
 
     init();
   }, [mission, continueGame]);
+
+  // Play audio when scene changes
+  // Always plays audio; accessibility mode prioritises extendedAudio
+  useEffect(() => {
+    if (!currentScene || !mission) return;
+
+    const playSceneAudio = async () => {
+      await stopCurrentAudio();
+
+      // Accessibility ON  → prefer extendedAudio, fall back to audio
+      // Accessibility OFF → use audio only
+      const audioPath = accessibilityMode
+        ? currentScene.extendedAudio || currentScene.audio
+        : currentScene.audio;
+      if (!audioPath) return;
+
+      const audioSource = mission.audio[audioPath];
+      if (!audioSource) return;
+
+      try {
+        const { sound } = await Audio.Sound.createAsync(audioSource);
+        soundRef.current = sound;
+        await sound.playAsync();
+      } catch (e) {
+        console.warn('Failed to play audio:', e);
+      }
+    };
+
+    playSceneAudio();
+
+    return () => {
+      stopCurrentAudio();
+    };
+  }, [currentScene, accessibilityMode, mission, stopCurrentAudio]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      stopCurrentAudio();
+    };
+  }, [stopCurrentAudio]);
 
   const handleOptionSelect = async (optionId: number) => {
     if (!mission || !currentScene || !gameState) return;
@@ -97,13 +161,13 @@ export default function GameScreen({ route, navigation }: Props) {
     );
   }
 
-  const imageSource = mission.images[currentScene.image];
+  const imageSource = resolveImage(mission, currentScene.image);
 
   return (
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         {imageSource ? (
-          <Image source={imageSource} style={styles.sceneImage} resizeMode="cover" />
+          <Image source={imageSource} style={styles.sceneImage} resizeMode="contain" />
         ) : (
           <View style={styles.imagePlaceholder}>
             <Text style={styles.imagePlaceholderText}>{currentScene.image}</Text>

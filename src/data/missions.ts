@@ -11,8 +11,18 @@ import mission1Json from '../../assets/missions/mission-1/mission.json';
 
 const mission1Ctx = require.context(
   '../../assets/missions/mission-1',
-  false,
+  true,
   /\.(jpg|jpeg|png|webp)$/
+);
+
+// ─── Audio auto-discovery ───────────────────────────────────────────
+// Recursively searches the mission folder for audio files.
+// Audio paths in JSON (e.g. "audio/file.mp3") match the discovered keys.
+
+const mission1AudioCtx = require.context(
+  '../../assets/missions/mission-1',
+  true,
+  /\.(mp3|wav|ogg|m4a)$/
 );
 
 function buildImageMap(ctx: RequireContext): Record<string, any> {
@@ -24,30 +34,66 @@ function buildImageMap(ctx: RequireContext): Record<string, any> {
   return images;
 }
 
+function buildAudioMap(ctx: RequireContext): Record<string, any> {
+  const audio: Record<string, any> = {};
+  for (const key of ctx.keys()) {
+    // key looks like "./audio/file.mp3" — strip the "./"
+    audio[key.replace('./', '')] = ctx(key);
+  }
+  return audio;
+}
+
 // ─── Build mission list ─────────────────────────────────────────────
 
-function buildMission(json: MissionJson, images: Record<string, any>): Mission {
+function buildMission(
+  json: MissionJson,
+  images: Record<string, any>,
+  audio: Record<string, any>
+): Mission {
+  // Support both old format (top-level boxes/connections)
+  // and new format (nested under data)
+  const boxes = json.data?.boxes ?? json.boxes ?? [];
+  const connections = json.data?.connections ?? json.connections ?? [];
+
   return {
-    id: json.id,
+    id: String(json.id),
     title: json.title,
     description: json.description,
-    data: {
-      boxes: json.boxes,
-      connections: json.connections,
-    },
+    data: { boxes, connections },
     images,
+    audio,
   };
 }
 
 export const missions: Mission[] = [
-  buildMission(mission1Json as MissionJson, buildImageMap(mission1Ctx)),
+  buildMission(
+    mission1Json as MissionJson,
+    buildImageMap(mission1Ctx),
+    buildAudioMap(mission1AudioCtx)
+  ),
   // To add more missions:
   // const mission2Ctx = require.context('../../assets/missions/mission-2', false, /\.(jpg|jpeg|png|webp)$/);
-  // buildMission(mission2Json as MissionJson, buildImageMap(mission2Ctx)),
+  // const mission2AudioCtx = require.context('../../assets/missions/mission-2', true, /\.(mp3|wav|ogg|m4a)$/);
+  // buildMission(mission2Json as MissionJson, buildImageMap(mission2Ctx), buildAudioMap(mission2AudioCtx)),
 ];
 
 export function getMissionById(id: string): Mission | undefined {
   return missions.find((m) => m.id === id);
+}
+
+/**
+ * Resolve an image reference to an ImageSourcePropType.
+ * Priority: bundled asset (require.context) → full URL
+ */
+export function resolveImage(
+  mission: Mission,
+  imageName: string | undefined
+) {
+  if (!imageName) return undefined;
+  const local = mission.images[imageName];
+  if (local) return local;
+  if (/^https?:\/\//.test(imageName)) return { uri: imageName };
+  return undefined;
 }
 
 export function getStartScene(mission: Mission): number {

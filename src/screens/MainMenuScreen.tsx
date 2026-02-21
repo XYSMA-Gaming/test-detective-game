@@ -9,21 +9,33 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/game';
-import { loadGameState } from '../utils/storage';
+import {
+  loadGameState,
+  loadAccessibilityMode,
+  saveAccessibilityMode,
+} from '../utils/storage';
 import { missions } from '../data/missions';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MainMenu'>;
 
 export default function MainMenuScreen({ navigation }: Props) {
   const [hasSave, setHasSave] = useState(false);
+  const [accessibilityMode, setAccessibilityMode] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       loadGameState().then((state) => {
         setHasSave(state !== null);
       });
+      loadAccessibilityMode().then(setAccessibilityMode);
     }, [])
   );
+
+  const toggleAccessibility = async () => {
+    const newValue = !accessibilityMode;
+    setAccessibilityMode(newValue);
+    await saveAccessibilityMode(newValue);
+  };
 
   const handleNewGame = () => {
     const firstMission = missions[0];
@@ -64,6 +76,21 @@ export default function MainMenuScreen({ navigation }: Props) {
             </TouchableOpacity>
           )}
         </View>
+
+        <TouchableOpacity
+          style={[
+            styles.accessibilityButton,
+            accessibilityMode && styles.accessibilityButtonActive,
+          ]}
+          onPress={toggleAccessibility}
+          accessibilityRole="switch"
+          accessibilityState={{ checked: accessibilityMode }}
+          accessibilityLabel="Audio narration for visually impaired users"
+        >
+          <Text style={styles.accessibilityButtonText}>
+            Audio Narration: {accessibilityMode ? 'ON' : 'OFF'}
+          </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -117,5 +144,24 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 20,
     fontWeight: '600',
+  },
+  accessibilityButton: {
+    marginTop: 40,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#533483',
+    backgroundColor: 'transparent',
+  },
+  accessibilityButtonActive: {
+    backgroundColor: '#533483',
+    borderColor: '#7b4fb5',
+  },
+  accessibilityButtonText: {
+    color: '#e0e0e0',
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });

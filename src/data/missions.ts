@@ -15,6 +15,16 @@ const mission1Ctx = require.context(
   /\.(jpg|jpeg|png|webp)$/
 );
 
+// ─── Audio auto-discovery ───────────────────────────────────────────
+// Recursively searches the mission folder for audio files.
+// Audio paths in JSON (e.g. "audio/file.mp3") match the discovered keys.
+
+const mission1AudioCtx = require.context(
+  '../../assets/missions/mission-1',
+  true,
+  /\.(mp3|wav|ogg|m4a)$/
+);
+
 function buildImageMap(ctx: RequireContext): Record<string, any> {
   const images: Record<string, any> = {};
   for (const key of ctx.keys()) {
@@ -24,9 +34,22 @@ function buildImageMap(ctx: RequireContext): Record<string, any> {
   return images;
 }
 
+function buildAudioMap(ctx: RequireContext): Record<string, any> {
+  const audio: Record<string, any> = {};
+  for (const key of ctx.keys()) {
+    // key looks like "./audio/file.mp3" — strip the "./"
+    audio[key.replace('./', '')] = ctx(key);
+  }
+  return audio;
+}
+
 // ─── Build mission list ─────────────────────────────────────────────
 
-function buildMission(json: MissionJson, images: Record<string, any>): Mission {
+function buildMission(
+  json: MissionJson,
+  images: Record<string, any>,
+  audio: Record<string, any>
+): Mission {
   return {
     id: json.id,
     title: json.title,
@@ -36,14 +59,20 @@ function buildMission(json: MissionJson, images: Record<string, any>): Mission {
       connections: json.connections,
     },
     images,
+    audio,
   };
 }
 
 export const missions: Mission[] = [
-  buildMission(mission1Json as MissionJson, buildImageMap(mission1Ctx)),
+  buildMission(
+    mission1Json as MissionJson,
+    buildImageMap(mission1Ctx),
+    buildAudioMap(mission1AudioCtx)
+  ),
   // To add more missions:
   // const mission2Ctx = require.context('../../assets/missions/mission-2', false, /\.(jpg|jpeg|png|webp)$/);
-  // buildMission(mission2Json as MissionJson, buildImageMap(mission2Ctx)),
+  // const mission2AudioCtx = require.context('../../assets/missions/mission-2', true, /\.(mp3|wav|ogg|m4a)$/);
+  // buildMission(mission2Json as MissionJson, buildImageMap(mission2Ctx), buildAudioMap(mission2AudioCtx)),
 ];
 
 export function getMissionById(id: string): Mission | undefined {

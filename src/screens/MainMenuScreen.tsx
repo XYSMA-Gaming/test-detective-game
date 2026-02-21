@@ -85,10 +85,10 @@ export default function MainMenuScreen({ navigation }: Props) {
           onPress={toggleAccessibility}
           accessibilityRole="switch"
           accessibilityState={{ checked: accessibilityMode }}
-          accessibilityLabel="Audio narration for visually impaired users"
+          accessibilityLabel="Extended audio descriptions for visually impaired users"
         >
           <Text style={styles.accessibilityButtonText}>
-            Audio Narration: {accessibilityMode ? 'ON' : 'OFF'}
+            Extended Audio: {accessibilityMode ? 'ON' : 'OFF'}
           </Text>
         </TouchableOpacity>
       </View>

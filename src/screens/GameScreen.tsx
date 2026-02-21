@@ -75,20 +75,19 @@ export default function GameScreen({ route, navigation }: Props) {
     init();
   }, [mission, continueGame]);
 
-  // Play audio when scene changes (only in accessibility mode)
+  // Play audio when scene changes
+  // Always plays audio; accessibility mode prioritises extendedAudio
   useEffect(() => {
     if (!currentScene || !mission) return;
-
-    if (!accessibilityMode) {
-      stopCurrentAudio();
-      return;
-    }
 
     const playSceneAudio = async () => {
       await stopCurrentAudio();
 
-      // Prefer extendedAudio, fall back to audio
-      const audioPath = currentScene.extendedAudio || currentScene.audio;
+      // Accessibility ON  → prefer extendedAudio, fall back to audio
+      // Accessibility OFF → use audio only
+      const audioPath = accessibilityMode
+        ? currentScene.extendedAudio || currentScene.audio
+        : currentScene.audio;
       if (!audioPath) return;
 
       const audioSource = mission.audio[audioPath];
@@ -162,7 +161,11 @@ export default function GameScreen({ route, navigation }: Props) {
     );
   }
 
-  const imageSource = mission.images[currentScene.image];
+  // Resolve image: try local asset map first, then treat as URI
+  const imageSource = mission.images[currentScene.image]
+    ?? (currentScene.image
+      ? { uri: currentScene.image }
+      : undefined);
 
   return (
     <View style={styles.container}>

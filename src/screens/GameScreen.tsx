@@ -167,7 +167,7 @@ export default function GameScreen({ route, navigation }: Props) {
     <View style={styles.container}>
       <View style={styles.imageContainer}>
         {imageSource ? (
-          <Image source={imageSource} style={styles.sceneImage} resizeMode="cover" />
+          <Image source={imageSource} style={styles.sceneImage} resizeMode="contain" />
         ) : (
           <View style={styles.imagePlaceholder}>
             <Text style={styles.imagePlaceholderText}>{currentScene.image}</Text>

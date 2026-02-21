@@ -81,6 +81,24 @@ export function getMissionById(id: string): Mission | undefined {
   return missions.find((m) => m.id === id);
 }
 
+// Matches "experiments.baseUrl" in app.json
+const BASE_URL = '/test-detective-game';
+
+/**
+ * Resolve an image reference to an ImageSourcePropType.
+ * Priority: bundled asset → full URL → static file in public/missions/<id>/
+ */
+export function resolveImage(
+  mission: Mission,
+  imageName: string | undefined
+) {
+  if (!imageName) return undefined;
+  const local = mission.images[imageName];
+  if (local) return local;
+  if (/^https?:\/\//.test(imageName)) return { uri: imageName };
+  return { uri: `${BASE_URL}/missions/${mission.id}/${imageName}` };
+}
+
 export function getStartScene(mission: Mission): number {
   // The start scene is the first box that is never a target of any connection
   const targetIds = new Set(mission.data.connections.map((c) => c.toBoxId));

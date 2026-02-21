@@ -10,7 +10,7 @@ import {
 import { Audio } from 'expo-av';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GameState, RootStackParamList, Scene } from '../types/game';
-import { getMissionById, getStartScene } from '../data/missions';
+import { getMissionById, getStartScene, resolveImage } from '../data/missions';
 import {
   clearGameState,
   loadAccessibilityMode,
@@ -161,11 +161,7 @@ export default function GameScreen({ route, navigation }: Props) {
     );
   }
 
-  // Resolve image: try local asset map first, then treat as URI
-  const imageSource = mission.images[currentScene.image]
-    ?? (currentScene.image
-      ? { uri: currentScene.image }
-      : undefined);
+  const imageSource = resolveImage(mission, currentScene.image);
 
   return (
     <View style={styles.container}>

@@ -35,12 +35,17 @@ export interface MissionJson {
   data?: {
     boxes: Scene[];
     connections: Connection[];
+    backgroundAudio?: string | null;
+    backgroundAudioName?: string | null;
+    startingSceneId?: number | null;
   };
 }
 
 export interface MissionData {
   boxes: Scene[];
   connections: Connection[];
+  backgroundAudio?: string | null;
+  startingSceneId?: number | null;
 }
 
 /** Map of image filename (e.g. "OIG1.jpg") to a require() source */

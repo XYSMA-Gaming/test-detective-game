@@ -29,6 +29,7 @@ export default function GameScreen({ route, navigation }: Props) {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [accessibilityMode, setAccessibilityMode] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
+  const bgSoundRef = useRef<Audio.Sound | null>(null);
 
   const stopCurrentAudio = useCallback(async () => {
     if (soundRef.current) {
@@ -39,6 +40,18 @@ export default function GameScreen({ route, navigation }: Props) {
         // Sound may already be unloaded
       }
       soundRef.current = null;
+    }
+  }, []);
+
+  const stopBackgroundAudio = useCallback(async () => {
+    if (bgSoundRef.current) {
+      try {
+        await bgSoundRef.current.stopAsync();
+        await bgSoundRef.current.unloadAsync();
+      } catch {
+        // Sound may already be unloaded
+      }
+      bgSoundRef.current = null;
     }
   }, []);
 
@@ -75,6 +88,36 @@ export default function GameScreen({ route, navigation }: Props) {
     init();
   }, [mission, continueGame]);
 
+  // Play mission background audio in a loop (separate from scene audio)
+  useEffect(() => {
+    if (!mission) return;
+
+    const bgAudioPath = mission.data.backgroundAudio;
+    if (!bgAudioPath) return;
+
+    const audioSource = mission.audio[bgAudioPath];
+    if (!audioSource) return;
+
+    const playBgAudio = async () => {
+      await stopBackgroundAudio();
+      try {
+        const { sound } = await Audio.Sound.createAsync(audioSource, {
+          isLooping: true,
+        });
+        bgSoundRef.current = sound;
+        await sound.playAsync();
+      } catch (e) {
+        console.warn('Failed to play background audio:', e);
+      }
+    };
+
+    playBgAudio();
+
+    return () => {
+      stopBackgroundAudio();
+    };
+  }, [mission, stopBackgroundAudio]);
+
   // Play audio when scene changes
   // Always plays audio; accessibility mode prioritises extendedAudio
   useEffect(() => {
@@ -109,12 +152,13 @@ export default function GameScreen({ route, navigation }: Props) {
     };
   }, [currentScene, accessibilityMode, mission, stopCurrentAudio]);
 
-  // Cleanup audio on unmount
+  // Cleanup all audio on unmount
   useEffect(() => {
     return () => {
       stopCurrentAudio();
+      stopBackgroundAudio();
     };
-  }, [stopCurrentAudio]);
+  }, [stopCurrentAudio, stopBackgroundAudio]);
 
   const handleOptionSelect = async (optionId: number) => {
     if (!mission || !currentScene || !gameState) return;

@@ -54,12 +54,14 @@ function buildMission(
   // and new format (nested under data)
   const boxes = json.data?.boxes ?? json.boxes ?? [];
   const connections = json.data?.connections ?? json.connections ?? [];
+  const backgroundAudio = json.data?.backgroundAudio ?? null;
+  const startingSceneId = json.data?.startingSceneId ?? null;
 
   return {
     id: String(json.id),
     title: json.title,
     description: json.description,
-    data: { boxes, connections },
+    data: { boxes, connections, backgroundAudio, startingSceneId },
     images,
     audio,
   };
@@ -97,7 +99,15 @@ export function resolveImage(
 }
 
 export function getStartScene(mission: Mission): number {
-  // The start scene is the first box that is never a target of any connection
+  // Use explicit startingSceneId if provided
+  if (mission.data.startingSceneId) {
+    const explicit = mission.data.boxes.find(
+      (b) => b.id === mission.data.startingSceneId
+    );
+    if (explicit) return explicit.id;
+  }
+
+  // Fallback: the first box that is never a target of any connection
   const targetIds = new Set(mission.data.connections.map((c) => c.toBoxId));
   const startScene = mission.data.boxes.find((b) => !targetIds.has(b.id));
   return startScene ? startScene.id : mission.data.boxes[0].id;

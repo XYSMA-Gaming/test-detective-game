@@ -7,6 +7,7 @@ export interface Option {
 
 export interface Scene {
   id: number;
+  type?: string | null;
   label: string;
   image: string;
   question: string;
@@ -15,6 +16,7 @@ export interface Scene {
   audioName?: string | null;
   extendedAudio?: string | null;
   extendedAudioName?: string | null;
+  checkpoint?: boolean;
 }
 
 export interface Connection {

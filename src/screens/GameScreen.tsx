@@ -6,11 +6,18 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { Audio } from 'expo-av';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { GameState, RootStackParamList, Scene } from '../types/game';
-import { getMissionById, getStartScene, resolveImage } from '../data/missions';
+import {
+  getBackgroundMusicTracks,
+  getMissionById,
+  getStartScene,
+  resolveImage,
+} from '../data/missions';
 import {
   clearGameState,
   loadAccessibilityMode,
@@ -28,7 +35,10 @@ export default function GameScreen({ route, navigation }: Props) {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [accessibilityMode, setAccessibilityMode] = useState(false);
+  const [activeBgMusic, setActiveBgMusic] = useState<string | null>(null);
+  const [bgMusicPickerVisible, setBgMusicPickerVisible] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
+  const bgSoundRef = useRef<Audio.Sound | null>(null);
 
   const stopCurrentAudio = useCallback(async () => {
     if (soundRef.current) {
@@ -39,6 +49,18 @@ export default function GameScreen({ route, navigation }: Props) {
         // Sound may already be unloaded
       }
       soundRef.current = null;
+    }
+  }, []);
+
+  const stopBackgroundAudio = useCallback(async () => {
+    if (bgSoundRef.current) {
+      try {
+        await bgSoundRef.current.stopAsync();
+        await bgSoundRef.current.unloadAsync();
+      } catch {
+        // Sound may already be unloaded
+      }
+      bgSoundRef.current = null;
     }
   }, []);
 
@@ -65,6 +87,7 @@ export default function GameScreen({ route, navigation }: Props) {
       }
 
       setGameState(state);
+      setActiveBgMusic(mission.data.backgroundAudio ?? null);
       const scene = mission.data.boxes.find(
         (b) => b.id === state!.currentSceneId
       );
@@ -74,6 +97,36 @@ export default function GameScreen({ route, navigation }: Props) {
 
     init();
   }, [mission, continueGame]);
+
+  // Play mission background audio in a loop (separate from scene audio)
+  useEffect(() => {
+    if (!mission || !activeBgMusic) {
+      stopBackgroundAudio();
+      return;
+    }
+
+    const audioSource = mission.audio[activeBgMusic];
+    if (!audioSource) return;
+
+    const playBgAudio = async () => {
+      await stopBackgroundAudio();
+      try {
+        const { sound } = await Audio.Sound.createAsync(audioSource, {
+          isLooping: true,
+        });
+        bgSoundRef.current = sound;
+        await sound.playAsync();
+      } catch (e) {
+        console.warn('Failed to play background audio:', e);
+      }
+    };
+
+    playBgAudio();
+
+    return () => {
+      stopBackgroundAudio();
+    };
+  }, [mission, activeBgMusic, stopBackgroundAudio]);
 
   // Play audio when scene changes
   // Always plays audio; accessibility mode prioritises extendedAudio
@@ -109,12 +162,13 @@ export default function GameScreen({ route, navigation }: Props) {
     };
   }, [currentScene, accessibilityMode, mission, stopCurrentAudio]);
 
-  // Cleanup audio on unmount
+  // Cleanup all audio on unmount
   useEffect(() => {
     return () => {
       stopCurrentAudio();
+      stopBackgroundAudio();
     };
-  }, [stopCurrentAudio]);
+  }, [stopCurrentAudio, stopBackgroundAudio]);
 
   const handleOptionSelect = async (optionId: number) => {
     if (!mission || !currentScene || !gameState) return;
@@ -162,6 +216,13 @@ export default function GameScreen({ route, navigation }: Props) {
   }
 
   const imageSource = resolveImage(mission, currentScene.image);
+  const bgMusicTracks = getBackgroundMusicTracks(mission);
+
+  const getTrackDisplayName = (path: string) => {
+    // "audio/abc123.mp3" → "abc123.mp3"
+    const filename = path.split('/').pop() ?? path;
+    return filename;
+  };
 
   return (
     <View style={styles.container}>
@@ -176,7 +237,76 @@ export default function GameScreen({ route, navigation }: Props) {
         <View style={styles.sceneLabelOverlay}>
           <Text style={styles.sceneLabel}>{currentScene.label}</Text>
         </View>
+        {bgMusicTracks.length > 0 && (
+          <TouchableOpacity
+            style={styles.musicButton}
+            onPress={() => setBgMusicPickerVisible(true)}
+          >
+            <Text style={styles.musicButtonText}>
+              {activeBgMusic ? '\u266B' : '\u266A'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
+
+      <Modal
+        visible={bgMusicPickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setBgMusicPickerVisible(false)}
+      >
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => setBgMusicPickerVisible(false)}
+        >
+          <Pressable style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Background Music</Text>
+            <ScrollView style={styles.modalScroll}>
+              <TouchableOpacity
+                style={[
+                  styles.musicTrackItem,
+                  !activeBgMusic && styles.musicTrackActive,
+                ]}
+                onPress={() => {
+                  setActiveBgMusic(null);
+                  setBgMusicPickerVisible(false);
+                }}
+              >
+                <Text
+                  style={[
+                    styles.musicTrackText,
+                    !activeBgMusic && styles.musicTrackTextActive,
+                  ]}
+                >
+                  None (Off)
+                </Text>
+              </TouchableOpacity>
+              {bgMusicTracks.map((track) => (
+                <TouchableOpacity
+                  key={track}
+                  style={[
+                    styles.musicTrackItem,
+                    activeBgMusic === track && styles.musicTrackActive,
+                  ]}
+                  onPress={() => {
+                    setActiveBgMusic(track);
+                    setBgMusicPickerVisible(false);
+                  }}
+                >
+                  <Text
+                    style={[
+                      styles.musicTrackText,
+                      activeBgMusic === track && styles.musicTrackTextActive,
+                    ]}
+                  >
+                    {getTrackDisplayName(track)}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       <View style={styles.contentContainer}>
         <Text style={styles.question}>{currentScene.question}</Text>
@@ -298,5 +428,63 @@ const styles = StyleSheet.create({
   optionTextSelected: {
     color: '#ffffff',
     fontWeight: '700',
+  },
+  musicButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  musicButtonText: {
+    color: '#e0e0e0',
+    fontSize: 20,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#1a1a2e',
+    borderRadius: 16,
+    padding: 20,
+    width: '80%',
+    maxHeight: '60%',
+    borderWidth: 1,
+    borderColor: '#533483',
+  },
+  modalTitle: {
+    color: '#e0e0e0',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalScroll: {
+    maxHeight: 300,
+  },
+  musicTrackItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginBottom: 8,
+    backgroundColor: '#16213e',
+  },
+  musicTrackActive: {
+    backgroundColor: '#533483',
+  },
+  musicTrackText: {
+    color: '#e0e0e0',
+    fontSize: 14,
+  },
+  musicTrackTextActive: {
+    color: '#ffffff',
+    fontWeight: '600',
   },
 });

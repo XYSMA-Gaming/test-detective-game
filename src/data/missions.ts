@@ -98,6 +98,21 @@ export function resolveImage(
   return undefined;
 }
 
+/**
+ * Returns audio paths that are NOT used by any scene (i.e. background music tracks).
+ */
+export function getBackgroundMusicTracks(mission: Mission): string[] {
+  const sceneAudioPaths = new Set<string>();
+  for (const box of mission.data.boxes) {
+    if (box.audio) sceneAudioPaths.add(box.audio);
+    if (box.extendedAudio) sceneAudioPaths.add(box.extendedAudio);
+  }
+
+  return Object.keys(mission.audio).filter(
+    (path) => !sceneAudioPaths.has(path)
+  );
+}
+
 export function getStartScene(mission: Mission): number {
   // Use explicit startingSceneId if provided
   if (mission.data.startingSceneId) {

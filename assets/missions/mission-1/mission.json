@@ -1,51 +1,305 @@
 {
-  "id": "mission-1",
-  "title": "The First Case",
-  "description": "Investigate the mysterious events and make your choices wisely.",
-  "boxes": [
-    {
-      "id": 1771194709306,
-      "label": "Screen 1",
-      "image": "OIG1.jpg",
-      "question": "asfafsafasfa",
-      "options": [
-        { "id": 1771194709307, "text": "Option 1" },
-        { "id": 1771194709308, "text": "Option 2" }
-      ]
-    },
-    {
-      "id": 1771194711777,
-      "label": "Screen 2",
-      "image": "OIG5.jpg",
-      "question": "asdasdasdasd",
-      "options": [
-        { "id": 1771194711778, "text": "Option 1" },
-        { "id": 1771194711779, "text": "Option 2" }
-      ]
-    },
-    {
-      "id": 1771194718685,
-      "label": "Screen 3",
-      "image": "OIG4.jpg",
-      "question": "asdasdasdasdasad",
-      "options": [
-        { "id": 1771194718686, "text": "Option 1" },
-        { "id": 1771194718687, "text": "Option 2" }
-      ]
+    "id": 2,
+    "title": "main",
+    "description": "",
+    "created_at": "2026-02-21 03:23:13",
+    "updated_at": "2026-08-10 20:36:50",
+    "data": {
+        "boxes": [
+            {
+                "id": 1771631448808,
+                "x": 460.61621399203483,
+                "y": 338.46011962137055,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 1",
+                "checkpoint": false,
+                "image": "images\/d2a28237f261b018bdb7651a09481c6d.png",
+                "audio": "audio\/3fc9bd9e5364a681f13ab7f5764a3d53.mp3",
+                "audioName": "ElevenLabs_2026_02_20T23_14_16_David_Deep_and_Engaging_Storyteller_pvc_sp100_s37_sb75_se33_b_m2_V2.mp3",
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1771631448809,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1771661143287,
+                "x": 1118.2354952791604,
+                "y": 364.94469177907314,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 2",
+                "checkpoint": false,
+                "image": "images\/203811c9ca0e8a50224f1346ba33e1a6.png",
+                "audio": "audio\/3d907af4fe2edcae34900a64c90ae8be.mp3",
+                "audioName": "2.1.mp3",
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1771661143288,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1771661297972,
+                "x": 1774.7019168329548,
+                "y": 374.62593318245683,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 3",
+                "checkpoint": false,
+                "image": "images\/d9a0f117ae5fb7361a51b25c84233f51.png",
+                "audio": "audio\/670199289431b95eda8257b009f9dfec.mp3",
+                "audioName": "2.2.mp3",
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1771661297973,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1771661316213,
+                "x": 2567.5645176073444,
+                "y": 411.37607517494166,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 4",
+                "checkpoint": false,
+                "image": "images\/c01b5ad5340340f50c22b193d11d4ede.png",
+                "audio": "audio\/3a2d040bb793cd94f53ab800f04332fa.mp3",
+                "audioName": "2.3.mp3",
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1771661316214,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1771802978212,
+                "x": 3341.055018781549,
+                "y": 409.77384863495683,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 5",
+                "checkpoint": false,
+                "image": "images\/4aa22bc40716284cb0cb3d1096ae19c4.png",
+                "audio": "audio\/1a9e01ce19155f2d9c802542ef1e0e66.mp3",
+                "audioName": "2.4.mp3",
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1771802978213,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1771803030198,
+                "x": 4222.71038512022,
+                "y": 424.7756358599211,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 6",
+                "checkpoint": false,
+                "image": "images\/9a2561161260961e045e31ecbc143748.png",
+                "audio": "audio\/16372b734f33d658728a0e56545d87c3.mp3",
+                "audioName": "2.5.mp3",
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1771803030199,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1772126282358,
+                "x": 5048.903645320649,
+                "y": 515.8191140352756,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 7",
+                "checkpoint": false,
+                "image": "images\/7c2736ebdff1c0331ce336142578ee2b.png",
+                "audio": null,
+                "audioName": null,
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1772126282359,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1772126349238,
+                "x": 5886.076342705268,
+                "y": 655.8873536996776,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 8",
+                "checkpoint": false,
+                "image": "images\/c995ed0026c638d0abace0a788a5a4b4.png",
+                "audio": null,
+                "audioName": null,
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1772126349239,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1772126691745,
+                "x": 6581.046087419281,
+                "y": 805.4417892487027,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 9",
+                "checkpoint": false,
+                "image": "images\/46c4b280f977ebcd74517fe5804987f5.png",
+                "audio": null,
+                "audioName": null,
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1772126691746,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1772126724169,
+                "x": 7237.2545873555455,
+                "y": 1021.0723996300977,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 10",
+                "checkpoint": false,
+                "image": "images\/06800fbb253fcfcf19cb62ac511b053e.png",
+                "audio": null,
+                "audioName": null,
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1772126724170,
+                        "text": "Next"
+                    }
+                ]
+            },
+            {
+                "id": 1772132734224,
+                "x": 1081.1383818805905,
+                "y": 1070.0351618325021,
+                "width": 400,
+                "height": 500,
+                "label": "Screen 11",
+                "checkpoint": false,
+                "image": null,
+                "audio": null,
+                "audioName": null,
+                "extendedAudio": null,
+                "extendedAudioName": null,
+                "question": "",
+                "options": [
+                    {
+                        "id": 1772132734225,
+                        "text": "Option 1"
+                    },
+                    {
+                        "id": 1772132734226,
+                        "text": "Option 2"
+                    }
+                ]
+            }
+        ],
+        "connections": [
+            {
+                "id": 1771661373185,
+                "fromBoxId": 1771661143287,
+                "fromOptionId": 1771661143288,
+                "toBoxId": 1771661297972
+            },
+            {
+                "id": 1771687770295,
+                "fromBoxId": 1771631448808,
+                "fromOptionId": 1771631448809,
+                "toBoxId": 1771661143287
+            },
+            {
+                "id": 1771802973805,
+                "fromBoxId": 1771661297972,
+                "fromOptionId": 1771661297973,
+                "toBoxId": 1771661316213
+            },
+            {
+                "id": 1771803026819,
+                "fromBoxId": 1771661316213,
+                "fromOptionId": 1771661316214,
+                "toBoxId": 1771802978212
+            },
+            {
+                "id": 1771803073578,
+                "fromBoxId": 1771802978212,
+                "fromOptionId": 1771802978213,
+                "toBoxId": 1771803030198
+            },
+            {
+                "id": 1772126345680,
+                "fromBoxId": 1771803030198,
+                "fromOptionId": 1771803030199,
+                "toBoxId": 1772126282358
+            },
+            {
+                "id": 1772126380274,
+                "fromBoxId": 1772126282358,
+                "fromOptionId": 1772126282359,
+                "toBoxId": 1772126349238
+            },
+            {
+                "id": 1772126701122,
+                "fromBoxId": 1772126349238,
+                "fromOptionId": 1772126349239,
+                "toBoxId": 1772126691745
+            },
+            {
+                "id": 1772126735141,
+                "fromBoxId": 1772126691745,
+                "fromOptionId": 1772126691746,
+                "toBoxId": 1772126724169
+            }
+        ],
+        "backgroundAudio": "audio\/7e583f73f17a72ab3e5103ee2b260c28.mp3",
+        "backgroundAudioName": "0.mp3",
+        "startingSceneId": 1771631448808
     }
-  ],
-  "connections": [
-    {
-      "id": 1771194716166,
-      "fromBoxId": 1771194709306,
-      "fromOptionId": 1771194709307,
-      "toBoxId": 1771194711777
-    },
-    {
-      "id": 1771194725077,
-      "fromBoxId": 1771194709306,
-      "fromOptionId": 1771194709308,
-      "toBoxId": 1771194718685
-    }
-  ]
 }
